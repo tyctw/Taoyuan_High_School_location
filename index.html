@@ -1,4 +1,4 @@
-<html><head><style>
+<html><head<style>
 body {
     font-family: 'Roboto', Arial, sans-serif;
     margin: 0;
@@ -205,13 +205,20 @@ body {
     font-size: 14px;
     background-color: white;
 }
+#footer {
+    background-color: #34495e;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 12px;
+}
 
 @media (min-width: 768px) {
     #content {
         flex-direction: row;
     }
     #map {
-        height: calc(100vh - 80px);
+        height: calc(100vh - 120px); /* 調整高度以適應頁腳 */
         flex: 2;
     }
     #sidebar {
@@ -243,7 +250,7 @@ body {
 <div id="header">
     <div style="display: flex; align-items: center;">
         <img src="https://cdn-icons-png.flaticon.com/512/2997/2997592.png" alt="School Icon">
-        <h1>桃園市高中職地圖</h1>
+        <h1>TYCTW桃園市高中職地圖</h1>
     </div>
     <div id="quick-links">
         <a href="https://sites.google.com/view/tyctw/" target="_blank" class="quick-link">主首頁</a>
@@ -280,6 +287,9 @@ body {
         </div>
         <div id="schoolList"></div>
     </div>
+</div>
+<div id="footer">
+    © 2024 TYCTW桃園市高中職地圖 | 資料來源：桃園市教育局 | 地圖資料：OpenStreetMap contributors
 </div>
 
 <script>
@@ -519,8 +529,8 @@ document.addEventListener('DOMContentLoaded', function() {
             sidebar.style.height = 'auto';
         } else {
             content.style.flexDirection = 'row';
-            map.style.height = 'calc(100vh - 80px)';
-            sidebar.style.height = 'calc(100vh - 80px)';
+            map.style.height = 'calc(100vh - 120px)'; // 調整高度以適應頁腳
+            sidebar.style.height = 'calc(100vh - 120px)'; // 調整高度以適應頁腳
         }
     }
 
