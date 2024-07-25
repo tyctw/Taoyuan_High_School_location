@@ -1,0 +1,295 @@
+<html><head><style>
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+#header {
+    background-color: #3498db;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+#header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+#content {
+    display: flex;
+    flex: 1;
+}
+#map {
+    flex: 2;
+    height: calc(100vh - 60px);
+    transition: all 0.3s ease;
+}
+#sidebar {
+    flex: 1;
+    background-color: white;
+    padding: 20px;
+    overflow-y: auto;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+.legend {
+    background-color: rgba(255,255,255,0.9);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.school-item {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: all 0.3s ease;
+}
+.school-item:hover {
+    background-color: #f0f0f0;
+    transform: translateX(5px);
+}
+.school-name {
+    font-weight: bold;
+    color: #2c3e50;
+}
+.school-district {
+    font-size: 12px;
+    color: #7f8c8d;
+}
+.school-distance {
+    font-size: 12px;
+    color: #3498db;
+    font-weight: bold;
+}
+.leaflet-popup-content-wrapper {
+    border-radius: 5px;
+}
+.leaflet-popup-content {
+    font-family: 'Roboto', Arial, sans-serif;
+}
+#location-info {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #ecf0f1;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+#address-input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    font-size: 14px;
+}
+#submit-address {
+    margin-top: 10px;
+    padding: 10px 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+#submit-address:hover {
+    background-color: #2980b9;
+}
+.loading {
+    display: none;
+    text-align: center;
+    margin-top: 10px;
+}
+.loading::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div id="header">
+    <h1>桃園市高中地圖</h1>
+</div>
+<div id="content">
+    <div id="map"></div>
+    <div id="sidebar">
+        <div class="legend">點擊標記或列表項目查看學校詳情</div>
+        <div id="location-info">
+            <p>輸入您的地址或點擊地圖以設置位置</p>
+            <input type="text" id="address-input" placeholder="輸入您的地址">
+            <button id="submit-address">提交</button>
+            <div class="loading"></div>
+        </div>
+        <div id="schoolList"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const taoyuanCenter = [24.9936, 121.3010];
+    const map = L.map('map').setView(taoyuanCenter, 11);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    const schools = [
+        {name: "永豐高中", address: "334 桃園市八德區永豐路609號", district: "八德區"},
+        {name: "新興高中", address: "334 桃園市八德區茄苳里永豐路563號", district: "八德區"},
+        {name: "大園高中", address: "桃園市大園區橫峰里27鄰大成路2段8號", district: "大園區"},
+        {name: "大興高中", address: "桃園市大園區永興路142號", district: "大園區"},
+        {name: "大溪高中", address: "335 桃園市大溪區康莊路641號", district: "大溪區"},
+        {name: "至善高中", address: "335 桃園市大溪區一德里康莊路645號", district: "大溪區"},
+        {name: "啟英高中", address: "320 桃園市中壢區中園路447號", district: "中壢區"},
+        {name: "內壢高中", address: "320 桃園市中壢區成章四街120號", district: "中壢區"},
+        {name: "中壢高中", address: "320 桃園市中壢區三光路115號", district: "中壢區"},
+        {name: "平鎮高中", address: "324 桃園市平鎮區環南路三段100號", district: "平鎮區"},
+        {name: "復旦高中", address: "324 桃園市平鎮區復旦路二段122號", district: "平鎮區"},
+        {name: "六和高中", address: "324 桃園市平鎮區陸光路180號", district: "平鎮區"},
+        {name: "育達高中", address: "324 桃園市平鎮區育達路160號", district: "平鎮區"},
+        {name: "陽明高中", address: "330 桃園市桃園區德壽街8號", district: "桃園區"},
+        {name: "振聲高中", address: "330 桃園市桃園區復興路439號", district: "桃園區"},
+        {name: "桃園高中", address: "330 桃園市桃園區成功路三段38號", district: "桃園區"},
+        {name: "振聲高中國中部", address: "330 桃園市桃園區復興路439號", district: "桃園區"},
+        {name: "武陵高中", address: "330 桃園市桃園區中山路889號", district: "桃園區"},
+        {name: "羅浮高中", address: "336 桃園市復興區羅浮里3鄰18號", district: "復興區"},
+        {name: "清華高中", address: "327 桃園市新屋區中華路658號", district: "新屋區"},
+        {name: "大華高中", address: "326 桃園市楊梅區三民路二段200號", district: "楊梅區"},
+        {name: "治平高中", address: "326 桃園市楊梅區埔心中興路137號", district: "楊梅區"},
+        {name: "楊梅高中", address: "326 桃園市楊梅區南高山頂7之2號", district: "楊梅區"},
+        {name: "龍潭高中", address: "325 桃園市龍潭區中正里神龍路155號", district: "龍潭區"},
+        {name: "壽山高中", address: "333 桃園市龜山區龜山里大同路23號", district: "龜山區"},
+        {name: "光啟高中", address: "333 桃園市龜山區自由街40號", district: "龜山區"},
+        {name: "南崁高中", address: "338 桃園市蘆竹區五福里仁愛路2段1號", district: "蘆竹區"},
+        {name: "觀音高中", address: "桃園市觀音區新坡里中山路2段519號", district: "觀音區"},
+        {name: "六和高中附設國中部", address: "32451 桃園市平鎮區陸光路180號", district: "平鎮區"}
+    ];
+
+    const districtColors = {
+        "八德區": "#FF6B6B", "大園區": "#4ECDC4", "大溪區": "#45B7D1",
+        "中壢區": "#FFA07A", "平鎮區": "#98D8C8", "桃園區": "#F7DC6F",
+        "復興區": "#D98880", "新屋區": "#7DCEA0", "楊梅區": "#5DADE2",
+        "龍潭區": "#FAD7A0", "龜山區": "#BB8FCE", "蘆竹區": "#45B39D",
+        "觀音區": "#F1948A"
+    };
+
+    const markers = {};
+    let userMarker = null;
+
+    schools.forEach(school => {
+        const icon = L.divIcon({
+            className: 'custom-div-icon',
+            html: `<div style='background-color:${districtColors[school.district]};width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;'>${school.name[0]}</div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        const marker = L.marker(getRandomCoordinate(taoyuanCenter), {icon: icon})
+            .addTo(map)
+            .bindPopup(`<b>${school.name}</b><br>${school.address}<br>${school.district}`);
+
+        markers[school.name] = marker;
+    });
+
+    const schoolListElement = document.getElementById('schoolList');
+    
+    function updateSchoolList() {
+        schoolListElement.innerHTML = '';
+        schools.forEach(school => {
+            const schoolItem = document.createElement('div');
+            schoolItem.className = 'school-item';
+            let distanceText = '';
+            if (userMarker) {
+                const distance = userMarker.getLatLng().distanceTo(markers[school.name].getLatLng()) / 1000;
+                distanceText = `<span class="school-distance">距離: ${distance.toFixed(2)} km</span>`;
+            }
+            schoolItem.innerHTML = `<span class="school-name">${school.name}</span><br><span class="school-district">${school.district}</span><br>${distanceText}`;
+            schoolItem.addEventListener('click', () => {
+                map.setView(markers[school.name].getLatLng(), 14);
+                markers[school.name].openPopup();
+            });
+            schoolListElement.appendChild(schoolItem);
+        });
+    }
+
+    updateSchoolList();
+
+    map.on('click', function(e) {
+        setUserLocation(e.latlng);
+    });
+
+    document.getElementById('submit-address').addEventListener('click', function() {
+        const address = document.getElementById('address-input').value;
+        if (address) {
+            document.querySelector('.loading').style.display = 'block';
+            geocodeAddress(address);
+        }
+    });
+
+    function setUserLocation(latlng) {
+        if (userMarker) {
+            map.removeLayer(userMarker);
+        }
+        userMarker = L.marker(latlng).addTo(map);
+        userMarker.bindPopup('您的位置').openPopup();
+
+        const locationInfo = document.getElementById('location-info');
+        locationInfo.innerHTML = `
+            <p>您的位置: ${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}</p>
+            <input type="text" id="address-input" placeholder="輸入您的地址">
+            <button id="submit-address">提交</button>
+            <div class="loading"></div>
+        `;
+
+        map.setView(latlng, 12);
+        updateSchoolList();
+    }
+
+    function geocodeAddress(address) {
+        const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+        
+        axios.get(nominatimUrl)
+            .then(response => {
+                document.querySelector('.loading').style.display = 'none';
+                if (response.data && response.data.length > 0) {
+                    const result = response.data[0];
+                    setUserLocation(L.latLng(result.lat, result.lon));
+                } else {
+                    alert('無法找到該地址，請嘗試其他地址。');
+                }
+            })
+            .catch(error => {
+                document.querySelector('.loading').style.display = 'none';
+                console.error('Geocoding error:', error);
+                alert('地址搜尋出錯，請稍後再試。');
+            });
+    }
+
+    function getRandomCoordinate(center) {
+        const lat = center[0] + (Math.random() - 0.5) * 0.2;
+        const lng = center[1] + (Math.random() - 0.5) * 0.2;
+        return [lat, lng];
+    }
+});
+</script>
+</body></html>
