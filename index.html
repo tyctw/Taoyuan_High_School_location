@@ -243,7 +243,7 @@ body {
 <div id="header">
     <div style="display: flex; align-items: center;">
         <img src="https://cdn-icons-png.flaticon.com/512/2997/2997592.png" alt="School Icon">
-        <h1>TYCTW桃園市高中職地圖</h1>
+        <h1>桃園市高中職地圖</h1>
     </div>
     <div id="quick-links">
         <a href="https://sites.google.com/view/tyctw/" target="_blank" class="quick-link">主首頁</a>
@@ -351,25 +351,34 @@ document.addEventListener('DOMContentLoaded', function() {
         districtSelect.appendChild(option);
     });
 
-    schools.forEach(school => {
-        const icon = L.divIcon({
-            className: 'custom-div-icon',
-            html: `<div style='background-color:${typeColors[school.type]};width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;'>${school.name[0]}</div>`,
-            iconSize: [30, 30],
-            iconAnchor: [15, 15]
+    function createSchoolMarkers() {
+        schools.forEach(school => {
+            const icon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style='background-color:${typeColors[school.type]};width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;'>${school.name[0]}</div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            const marker = L.marker(getRandomCoordinate(taoyuanCenter), {icon: icon})
+                .bindPopup(`<b>${school.name}</b><br>${school.address}<br>${school.type}<br>${school.isPublic ? '公立' : '私立'}<br><a href="${school.website}" target="_blank">學校網站</a>`);
+
+            markers[school.name] = marker;
         });
+    }
 
-        const marker = L.marker(getRandomCoordinate(taoyuanCenter), {icon: icon})
-            .addTo(map)
-            .bindPopup(`<b>${school.name}</b><br>${school.address}<br>${school.type}<br>${school.isPublic ? '公立' : '私立'}<br><a href="${school.website}" target="_blank">學校網站</a>`);
-
-        markers[school.name] = marker;
-    });
+    createSchoolMarkers();
 
     const schoolListElement = document.getElementById('schoolList');
     
     function updateSchoolList() {
         schoolListElement.innerHTML = '';
+        map.eachLayer((layer) => {
+            if (layer instanceof L.Marker && layer !== userMarker) {
+                map.removeLayer(layer);
+            }
+        });
+
         schools.forEach(school => {
             const schoolDistrict = school.address.split('市')[1].split('區')[0] + '區';
             if ((currentOwnershipFilter === 'all' || 
@@ -398,6 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     markers[school.name].openPopup();
                 });
                 schoolListElement.appendChild(schoolItem);
+                markers[school.name].addTo(map);
             }
         });
     }
