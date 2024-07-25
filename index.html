@@ -14,10 +14,18 @@ body {
     padding: 20px;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 #header h1 {
     margin: 0;
     font-size: 24px;
+}
+#header img {
+    width: 40px;
+    height: 40px;
+    margin-right: 15px;
 }
 #content {
     display: flex;
@@ -25,7 +33,7 @@ body {
 }
 #map {
     flex: 2;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 80px);
     transition: all 0.3s ease;
 }
 #sidebar {
@@ -49,16 +57,36 @@ body {
     padding: 10px;
     border-bottom: 1px solid #eee;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
 }
 .school-item:hover {
     background-color: #f0f0f0;
     transform: translateX(5px);
 }
+.school-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+}
+.school-info {
+    flex-grow: 1;
+}
 .school-name {
     font-weight: bold;
     color: #2c3e50;
 }
-.school-district {
+.school-type {
+    font-size: 12px;
+    color: #7f8c8d;
+}
+.school-address {
     font-size: 12px;
     color: #7f8c8d;
 }
@@ -120,6 +148,35 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+#filter-options {
+    margin-bottom: 20px;
+}
+.filter-group {
+    margin-bottom: 10px;
+}
+.filter-btn {
+    padding: 8px 12px;
+    background-color: #ecf0f1;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+.filter-btn.active {
+    background-color: #3498db;
+    color: white;
+}
+#district-select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: white;
+}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
@@ -128,12 +185,30 @@ body {
 </head>
 <body>
 <div id="header">
-    <h1>桃園市高中地圖</h1>
+    <img src="https://cdn-icons-png.flaticon.com/512/2997/2997592.png" alt="School Icon">
+    <h1>桃園市高中職地圖</h1>
 </div>
 <div id="content">
     <div id="map"></div>
     <div id="sidebar">
         <div class="legend">點擊標記或列表項目查看學校詳情</div>
+        <div id="filter-options">
+            <select id="district-select">
+                <option value="all">全部區域</option>
+                <!-- 區域選項將在JavaScript中動態添加 -->
+            </select>
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="ownership" data-value="all">全部</button>
+                <button class="filter-btn" data-filter="ownership" data-value="public">公立</button>
+                <button class="filter-btn" data-filter="ownership" data-value="private">私立</button>
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="type" data-value="all">全部</button>
+                <button class="filter-btn" data-filter="type" data-value="高中">高中</button>
+                <button class="filter-btn" data-filter="type" data-value="高職">高職</button>
+                <button class="filter-btn" data-filter="type" data-value="五專">五專</button>
+            </div>
+        </div>
         <div id="location-info">
             <p>輸入您的地址或點擊地圖以設置位置</p>
             <input type="text" id="address-input" placeholder="輸入您的地址">
@@ -154,59 +229,76 @@ document.addEventListener('DOMContentLoaded', function() {
     }).addTo(map);
 
     const schools = [
-        {name: "永豐高中", address: "334 桃園市八德區永豐路609號", district: "八德區"},
-        {name: "新興高中", address: "334 桃園市八德區茄苳里永豐路563號", district: "八德區"},
-        {name: "大園高中", address: "桃園市大園區橫峰里27鄰大成路2段8號", district: "大園區"},
-        {name: "大興高中", address: "桃園市大園區永興路142號", district: "大園區"},
-        {name: "大溪高中", address: "335 桃園市大溪區康莊路641號", district: "大溪區"},
-        {name: "至善高中", address: "335 桃園市大溪區一德里康莊路645號", district: "大溪區"},
-        {name: "啟英高中", address: "320 桃園市中壢區中園路447號", district: "中壢區"},
-        {name: "內壢高中", address: "320 桃園市中壢區成章四街120號", district: "中壢區"},
-        {name: "中壢高中", address: "320 桃園市中壢區三光路115號", district: "中壢區"},
-        {name: "平鎮高中", address: "324 桃園市平鎮區環南路三段100號", district: "平鎮區"},
-        {name: "復旦高中", address: "324 桃園市平鎮區復旦路二段122號", district: "平鎮區"},
-        {name: "六和高中", address: "324 桃園市平鎮區陸光路180號", district: "平鎮區"},
-        {name: "育達高中", address: "324 桃園市平鎮區育達路160號", district: "平鎮區"},
-        {name: "陽明高中", address: "330 桃園市桃園區德壽街8號", district: "桃園區"},
-        {name: "振聲高中", address: "330 桃園市桃園區復興路439號", district: "桃園區"},
-        {name: "桃園高中", address: "330 桃園市桃園區成功路三段38號", district: "桃園區"},
-        {name: "振聲高中國中部", address: "330 桃園市桃園區復興路439號", district: "桃園區"},
-        {name: "武陵高中", address: "330 桃園市桃園區中山路889號", district: "桃園區"},
-        {name: "羅浮高中", address: "336 桃園市復興區羅浮里3鄰18號", district: "復興區"},
-        {name: "清華高中", address: "327 桃園市新屋區中華路658號", district: "新屋區"},
-        {name: "大華高中", address: "326 桃園市楊梅區三民路二段200號", district: "楊梅區"},
-        {name: "治平高中", address: "326 桃園市楊梅區埔心中興路137號", district: "楊梅區"},
-        {name: "楊梅高中", address: "326 桃園市楊梅區南高山頂7之2號", district: "楊梅區"},
-        {name: "龍潭高中", address: "325 桃園市龍潭區中正里神龍路155號", district: "龍潭區"},
-        {name: "壽山高中", address: "333 桃園市龜山區龜山里大同路23號", district: "龜山區"},
-        {name: "光啟高中", address: "333 桃園市龜山區自由街40號", district: "龜山區"},
-        {name: "南崁高中", address: "338 桃園市蘆竹區五福里仁愛路2段1號", district: "蘆竹區"},
-        {name: "觀音高中", address: "桃園市觀音區新坡里中山路2段519號", district: "觀音區"},
-        {name: "六和高中附設國中部", address: "32451 桃園市平鎮區陸光路180號", district: "平鎮區"}
+        {name: "方曙商工", address: "桃園市龍潭區上林村中原路一段50號", type: "高職", website: "http://www.fsvs.tyc.edu.tw", isPublic: false},
+        {name: "永平工商", address: "桃園市楊梅區(埔心)永平路480號", type: "高職", website: "http://www.ypvs.tyc.edu.tw", isPublic: false},
+        {name: "成功工商", address: "桃園市龜山區新興村明德路162巷100號", type: "高職", website: "http://www.ckvs.tyc.edu.tw", isPublic: false},
+        {name: "中壢家商", address: "桃園市中壢區德育路36號", type: "高職", website: "http://www.pclhvs.cl.edu.tw", isPublic: true},
+        {name: "中壢高商", address: "桃園市中壢區中央西路二段141巷100號", type: "高職", website: "http://www.clvsc.tyc.edu.tw", isPublic: true},
+        {name: "桃園農工", address: "桃園市桃園區成功路二段144號", type: "高職", website: "http://www.tyai.tyc.edu.tw", isPublic: true},
+        {name: "龍潭農工", address: "桃園市龍潭區神龍路155號", type: "高職", website: "http://www.ltvs.tyc.edu.tw", isPublic: true},
+        {name: "大華高中", address: "桃園市楊梅區三民路二段200號", type: "高中", website: "http://www.thsh.tyc.edu.tw", isPublic: false},
+        {name: "大興高中", address: "桃園市大園區永興路142號", type: "高中", website: "http://www.dxhs.tyc.edu.tw", isPublic: false},
+        {name: "六和高中", address: "桃園市平鎮區陸光路180號", type: "高中", website: "http://www.lhvs.tyc.edu.tw", isPublic: false},
+        {name: "光啟高中", address: "桃園市龜山區自由街40號", type: "高中", website: "http://www.phsh.tyc.edu.tw", isPublic: false},
+        {name: "至善高中", address: "桃園市大溪區康莊路645號", type: "高中", website: "http://www.tzsavs.tyc.edu.tw", isPublic: false},
+        {name: "育達高中", address: "桃園市平鎮區育達路160號", type: "高中", website: "http://www.yuda.tyc.edu.tw", isPublic: false},
+        {name: "治平高中", address: "桃園市楊梅區埔心中興路137號", type: "高中", website: "http://web.cpshs.tyc.edu.tw", isPublic: false},
+        {name: "泉僑高中", address: "桃園市龍潭區中正路佳安段466號", type: "高中", website: "http://www.cchs.tyc.edu.tw", isPublic: false},
+        {name: "振聲高中", address: "桃園市桃園區復興路439號", type: "高中", website: "http://www.fxsh.tyc.edu.tw", isPublic: false},
+        {name: "啟英高中", address: "桃園市中壢區中園路447號", type: "高中", website: "http://www.cyvs.tyc.edu.tw", isPublic: false},
+        {name: "清華高中", address: "桃園市新屋區中華路658號", type: "高中", website: "http://www.chvs.tyc.edu.tw", isPublic: false},
+        {name: "復旦高中", address: "桃園市平鎮區復旦路二段122號", type: "高中", website: "http://www.fths.tyc.edu.tw", isPublic: false},
+        {name: "新興高中", address: "桃園市八德區永豐路563號", type: "高中", website: "http://www.hshs.tyc.edu.tw", isPublic: false},
+        {name: "中央大學附屬中壢高中", address: "桃園市中壢區三光路115號", type: "高中", website: "http://www.clhs.tyc.edu.tw", isPublic: true},
+        {name: "內壢高中", address: "桃園市中壢區成章四街120號", type: "高中", website: "http://www.nlhs.tyc.edu.tw", isPublic: true},
+        {name: "武陵高中", address: "桃園市桃園區中山路889號", type: "高中", website: "http://www.wlsh.tyc.edu.tw", isPublic: true},
+        {name: "桃園高中", address: "桃園市桃園區成功路三段38號", type: "高中", website: "http://www.tysh.tyc.edu.tw", isPublic: true},
+        {name: "陽明高中", address: "桃園市桃園區德壽街8號", type: "高中", website: "http://www.pymhs.tyc.edu.tw", isPublic: true},
+        {name: "楊梅高中", address: "桃園市楊梅區高獅路5號", type: "高中", website: "http://www.ymhs.tyc.edu.tw", isPublic: true},
+        {name: "龍潭高級中學", address: "桃園市龍潭區神龍路155號", type: "高中", website: "http://www.ltvs.tyc.edu.tw", isPublic: true},
+        {name: "大園國際高中", address: "桃園市大園區大成路二段8號", type: "高中", website: "http://www.dysh.tyc.edu.tw", isPublic: true},
+        {name: "大溪高中", address: "桃園市大溪區康莊路641號", type: "高中", website: "http://www.dssh.tyc.edu.tw", isPublic: true},
+        {name: "平鎮高中", address: "桃園市平鎮區環南路三段100號", type: "高中", website: "http://www.pjhs.tyc.edu.tw", isPublic: true},
+        {name: "永豐高中", address: "桃園市八德區永豐路609號", type: "高中", website: "http://www.yfms.tyc.edu.tw", isPublic: true},
+        {name: "南崁高中", address: "桃園市蘆竹區五福村仁愛路2段1號", type: "高中", website: "http://www.nkjh.tyc.edu.tw", isPublic: true},
+        {name: "壽山高中", address: "桃園市龜山區大同路23號", type: "高中", website: "http://gotop-ks.sobuy.com.tw/schoolpad-test/front/bin/home.phtml", isPublic: true},
+        {name: "觀音高中", address: "桃園市觀音區新坡村中山路2段519號", type: "高中", website: "http://163.30.174.141/GTHs/gths/", isPublic: true},
+        {name: "新生醫護管理專科學校", address: "桃園市龍潭區中豐路高平段418號", type: "五專", website: "http://www.web.hsc.edu.tw/bin/home.php", isPublic: false}
     ];
 
-    const districtColors = {
-        "八德區": "#FF6B6B", "大園區": "#4ECDC4", "大溪區": "#45B7D1",
-        "中壢區": "#FFA07A", "平鎮區": "#98D8C8", "桃園區": "#F7DC6F",
-        "復興區": "#D98880", "新屋區": "#7DCEA0", "楊梅區": "#5DADE2",
-        "龍潭區": "#FAD7A0", "龜山區": "#BB8FCE", "蘆竹區": "#45B39D",
-        "觀音區": "#F1948A"
+    const typeColors = {
+        "高職": "#FF6B6B",
+        "高中": "#4ECDC4",
+        "五專": "#45B7D1"
     };
 
     const markers = {};
     let userMarker = null;
+    let currentOwnershipFilter = 'all';
+    let currentTypeFilter = 'all';
+    let currentDistrictFilter = 'all';
+
+    // 提取所有區域並添加到選擇框中
+    const districts = [...new Set(schools.map(school => school.address.split('市')[1].split('區')[0] + '區'))];
+    const districtSelect = document.getElementById('district-select');
+    districts.forEach(district => {
+        const option = document.createElement('option');
+        option.value = district;
+        option.textContent = district;
+        districtSelect.appendChild(option);
+    });
 
     schools.forEach(school => {
         const icon = L.divIcon({
             className: 'custom-div-icon',
-            html: `<div style='background-color:${districtColors[school.district]};width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;'>${school.name[0]}</div>`,
+            html: `<div style='background-color:${typeColors[school.type]};width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;'>${school.name[0]}</div>`,
             iconSize: [30, 30],
             iconAnchor: [15, 15]
         });
 
         const marker = L.marker(getRandomCoordinate(taoyuanCenter), {icon: icon})
             .addTo(map)
-            .bindPopup(`<b>${school.name}</b><br>${school.address}<br>${school.district}`);
+            .bindPopup(`<b>${school.name}</b><br>${school.address}<br>${school.type}<br>${school.isPublic ? '公立' : '私立'}<br><a href="${school.website}" target="_blank">學校網站</a>`);
 
         markers[school.name] = marker;
     });
@@ -216,19 +308,34 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateSchoolList() {
         schoolListElement.innerHTML = '';
         schools.forEach(school => {
-            const schoolItem = document.createElement('div');
-            schoolItem.className = 'school-item';
-            let distanceText = '';
-            if (userMarker) {
-                const distance = userMarker.getLatLng().distanceTo(markers[school.name].getLatLng()) / 1000;
-                distanceText = `<span class="school-distance">距離: ${distance.toFixed(2)} km</span>`;
+            const schoolDistrict = school.address.split('市')[1].split('區')[0] + '區';
+            if ((currentOwnershipFilter === 'all' || 
+                (currentOwnershipFilter === 'public' && school.isPublic) || 
+                (currentOwnershipFilter === 'private' && !school.isPublic)) &&
+                (currentTypeFilter === 'all' || currentTypeFilter === school.type) &&
+                (currentDistrictFilter === 'all' || currentDistrictFilter === schoolDistrict)) {
+                const schoolItem = document.createElement('div');
+                schoolItem.className = 'school-item';
+                let distanceText = '';
+                if (userMarker) {
+                    const distance = userMarker.getLatLng().distanceTo(markers[school.name].getLatLng()) / 1000;
+                    distanceText = `<span class="school-distance">距離: ${distance.toFixed(2)} km</span>`;
+                }
+                schoolItem.innerHTML = `
+                    <div class="school-icon" style="background-color:${typeColors[school.type]}">${school.name[0]}</div>
+                    <div class="school-info">
+                        <span class="school-name">${school.name}</span><br>
+                        <span class="school-type">${school.type} (${school.isPublic ? '公立' : '私立'})</span><br>
+                        <span class="school-address">${school.address}</span><br>
+                        ${distanceText}
+                    </div>
+                `;
+                schoolItem.addEventListener('click', () => {
+                    map.setView(markers[school.name].getLatLng(), 14);
+                    markers[school.name].openPopup();
+                });
+                schoolListElement.appendChild(schoolItem);
             }
-            schoolItem.innerHTML = `<span class="school-name">${school.name}</span><br><span class="school-district">${school.district}</span><br>${distanceText}`;
-            schoolItem.addEventListener('click', () => {
-                map.setView(markers[school.name].getLatLng(), 14);
-                markers[school.name].openPopup();
-            });
-            schoolListElement.appendChild(schoolItem);
         });
     }
 
@@ -250,7 +357,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (userMarker) {
             map.removeLayer(userMarker);
         }
-        userMarker = L.marker(latlng).addTo(map);
+        userMarker = L.marker(latlng, {
+            icon: L.divIcon({
+                className: 'custom-div-icon',
+                html: '<div style="background-color:#3498db;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;">您</div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            })
+        }).addTo(map);
         userMarker.bindPopup('您的位置').openPopup();
 
         const locationInfo = document.getElementById('location-info');
@@ -290,6 +404,34 @@ document.addEventListener('DOMContentLoaded', function() {
         const lng = center[1] + (Math.random() - 0.5) * 0.2;
         return [lat, lng];
     }
+
+    // Add event listeners for filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filterType = this.dataset.filter;
+            const filterValue = this.dataset.value;
+            
+            // Remove active class from all buttons in the same group
+            document.querySelectorAll(`.filter-btn[data-filter="${filterType}"]`).forEach(b => b.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            if (filterType === 'ownership') {
+                currentOwnershipFilter = filterValue;
+            } else if (filterType === 'type') {
+                currentTypeFilter = filterValue;
+            }
+            
+            updateSchoolList();
+        });
+    });
+
+    // Add event listener for district select
+    districtSelect.addEventListener('change', function() {
+        currentDistrictFilter = this.value;
+        updateSchoolList();
+    });
 });
 </script>
 </body></html>
