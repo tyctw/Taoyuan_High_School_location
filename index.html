@@ -451,7 +451,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 let distanceText = '';
                 if (userMarker) {
                     const distance = userMarker.getLatLng().distanceTo(markers[school.name].getLatLng()) / 1000;
-                    distanceText = `<span class="school-distance">距離: ${distance.toFixed(2)} km</span>`;
                 }
                 schoolItem.innerHTML = `
                     <div class="school-icon" style="background-color:${typeColors[school.type]}">${school.name[0]}</div>
