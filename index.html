@@ -1,341 +1,545 @@
-<html><head>
-    <title>TYCTW桃園市高中職地圖</title><style>
-body {
-    font-family: 'Roboto', Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f5f5f5;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    color: #333;
-}
-#header {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-#header h1 {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-}
-#header img {
-    width: 40px;
-    height: 40px;
-    margin-right: 15px;
-    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
-}
-#quick-links {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 15px;
-}
-.quick-link {
-    color: white;
-    text-decoration: none;
-    margin: 5px 10px;
-    padding: 8px 15px;
-    border-radius: 20px;
-    transition: all 0.3s ease;
-    font-size: 14px;
-    background-color: rgba(255,255,255,0.1);
-}
-.quick-link:hover {
-    background-color: rgba(255,255,255,0.2);
-    transform: translateY(-2px);
-}
-#content {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-}
-#map {
-    flex: 1;
-    height: 50vh;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-#sidebar {
-    flex: 1;
-    background-color: white;
-    padding: 20px;
-    overflow-y: auto;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-}
-.legend {
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
-    font-size: 14px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    border-left: 4px solid #3498db;
-}
-.school-item {
-    cursor: pointer;
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-.school-item:hover {
-    background-color: #f0f0f0;
-    transform: translateY(-2px);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-.school-icon {
-    width: 40px;
-    height: 40px;
-    margin-right: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    color: white;
-    font-weight: bold;
-    font-size: 18px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-.school-info {
-    flex-grow: 1;
-}
-.school-name {
-    font-weight: bold;
-    color: #2c3e50;
-    font-size: 18px;
-    margin-bottom: 5px;
-}
-.school-type {
-    font-size: 14px;
-    color: #7f8c8d;
-    margin-bottom: 3px;
-}
-.school-address {
-    font-size: 14px;
-    color: #7f8c8d;
-}
-.school-distance {
-    font-size: 14px;
-    color: #3498db;
-    font-weight: bold;
-    margin-top: 5px;
-}
-.leaflet-popup-content-wrapper {
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-}
-.leaflet-popup-content {
-    font-family: 'Roboto', Arial, sans-serif;
-    padding: 10px;
-}
-#location-info {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #ecf0f1;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-#address-input {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    border: 1px solid #bdc3c7;
-    border-radius: 5px;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-#address-input:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-#submit-address {
-    margin-top: 10px;
-    padding: 12px 20px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
-    font-weight: bold;
-}
-#submit-address:hover {
-    background-color: #2980b9;
-    transform: translateY(-2px);
-}
-.loading {
-    display: none;
-    text-align: center;
-    margin-top: 15px;
-}
-.loading::after {
-    content: '';
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-#filter-options {
-    margin-bottom: 20px;
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.filter-group {
-    margin-bottom: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-}
-.filter-btn {
-    padding: 10px 15px;
-    background-color: #ecf0f1;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 10px;
-    flex-grow: 1;
-    margin-right: 10px;
-    font-size: 14px;
-    font-weight: 500;
-}
-.filter-btn:last-child {
-    margin-right: 0;
-}
-.filter-btn.active {
-    background-color: #3498db;
-    color: white;
-    box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
-}
-#district-select {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #bdc3c7;
-    border-radius: 5px;
-    font-size: 14px;
-    background-color: white;
-    transition: all 0.3s ease;
-}
-#district-select:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-#footer {
-    background-color: #34495e;
-    color: white;
-    text-align: center;
-    padding: 15px;
-    font-size: 14px;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TYCTW桃園市高中職地圖</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4285F4;
+            --secondary-color: #34A853;
+            --accent-color: #EA4335;
+            --light-color: #F8F9FA;
+            --dark-color: #202124;
+            --gray-color: #5F6368;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        /* 導航欄樣式 */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), #5B9BFF);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 1rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            transition: var(--transition);
+        }
+        
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+        
+        /* 主要內容區 */
+        .container {
+            display: flex;
+            flex: 1;
+        }
+        
+        /* 地圖區域 */
+        .map-container {
+            flex: 2;
+            height: calc(100vh - 70px);
+            position: relative;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        /* 側邊欄 */
+        .sidebar {
+            flex: 1;
+            background-color: white;
+            overflow-y: auto;
+            padding: 1.5rem;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.05);
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 20px;
+            background-color: var(--light-color);
+            color: var(--gray-color);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .filter-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        
+        .location-card input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin: 0.5rem 0 1rem;
+            font-family: inherit;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .submit-btn:hover {
+            background-color: #3B78E7;
+            transform: translateY(-2px);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 學校列表 */
+        .school-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .school-item {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .school-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .school-icon {
+            min-width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .school-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        
+        .school-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--dark-color);
+        }
+        
+        .school-type {
+            font-size: 0.9rem;
+            color: var(--gray-color);
+        }
+        
+        .school-address {
+            font-size: 0.9rem;
+            color: var(--gray-color);
+        }
+        
+        .school-distance {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        /* 頁腳 */
+        .footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        /* 彈出視窗樣式 */
+        .leaflet-popup-content-wrapper {
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .leaflet-popup-content {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .popup-content {
+            font-family: 'Noto Sans TC', sans-serif;
+            width: 300px;
+        }
+        
+        .popup-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .popup-body {
+            padding: 1rem;
+        }
+        
+        .popup-title {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .popup-info {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--gray-color);
+        }
+        
+        .popup-link {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+        
+        .popup-link:hover {
+            background-color: #3B78E7;
+        }
+        
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .map-container {
+                height: 50vh;
+                flex: none;
+            }
+            
+            .sidebar {
+                max-width: none;
+                height: auto;
+            }
+            
+            .hamburger {
+                display: flex;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 250px;
+                height: 100vh;
+                background-color: var(--dark-color);
+                flex-direction: column;
+                padding: 80px 2rem 2rem;
+                gap: 1rem;
+                transform: translateX(100%);
+                opacity: 0;
+                transition: var(--transition);
+                z-index: 1000;
+                box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            }
+            
+            .nav-links.active {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            
+            .nav-link {
+                width: 100%;
+                text-align: left;
+                padding: 0.8rem 1rem;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+            }
+            
+            .nav-link:before {
+                content: '›';
+                margin-right: 8px;
+                font-size: 1.2rem;
+                font-weight: bold;
+            }
+        }
 
-@media (min-width: 768px) {
-    #content {
-        flex-direction: row;
-    }
-    #map {
-        height: calc(100vh - 140px);
-        flex: 2;
-    }
-    #sidebar {
-        flex: 1;
-        box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-    }
-    #header {
-        padding: 25px;
-    }
-    #header h1 {
-        font-size: 32px;
-    }
-    #header img {
-        width: 50px;
-        height: 50px;
-    }
-    .quick-link {
-        font-size: 16px;
-    }
-}
-</style>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        /* 暗色模式 */
+        .dark-mode {
+            --light-color: #202124;
+            --dark-color: #F8F9FA;
+            --gray-color: #BDC1C6;
+            background-color: #121212;
+            color: #E8EAED;
+        }
+
+        .dark-mode .sidebar,
+        .dark-mode .card,
+        .dark-mode .school-item {
+            background-color: #202124;
+        }
+
+        .dark-mode .filter-btn {
+            background-color: #303134;
+            color: #E8EAED;
+        }
+
+        .dark-mode .footer {
+            background-color: #303134;
+        }
+
+        .dark-mode input,
+        .dark-mode select {
+            background-color: #303134;
+            color: #E8EAED;
+            border-color: #5F6368;
+        }
+    </style>
 </head>
 <body>
-<div id="header">
-    <div style="display: flex; align-items: center;">
-        <img src="https://cdn-icons-png.flaticon.com/512/2997/2997592.png" alt="School Icon">
-        <h1>TYCTW桃園市高中職地圖</h1>
-    </div>
-    <div id="quick-links">
-        <a href="https://sites.google.com/view/tyctw/" target="_blank" class="quick-link">主首頁</a>
-        <a href="https://tyctw.github.io/" target="_blank" class="quick-link">會考落點分析系統</a>
-        <a href="https://tyctw.github.io/Navigation/" target="_blank" class="quick-link">查看更多資訊</a>
-    </div>
-</div>
-<div id="content">
-    <div id="map"></div>
-    <div id="sidebar">
-        <div class="legend">點擊標記或列表項目查看學校詳情</div>
-        <div id="filter-options">
-            <select id="district-select">
-                <option value="all">全部區域</option>
-                <!-- 區域選項將在JavaScript中動態添加 -->
-            </select>
-            <div class="filter-group">
-                <button class="filter-btn active" data-filter="ownership" data-value="all">全部</button>
-                <button class="filter-btn" data-filter="ownership" data-value="public">公立</button>
-                <button class="filter-btn" data-filter="ownership" data-value="private">私立</button>
+    <nav class="navbar">
+        <a href="#" class="logo">
+            <img src="https://cdn-icons-png.flaticon.com/512/2997/2997592.png" alt="學校圖標">
+            <h1>TYCTW桃園市高中職地圖</h1>
+        </a>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="nav-links" id="navLinks">
+            <a href="https://sites.google.com/view/tyctw/" target="_blank" class="nav-link">主首頁</a>
+            <a href="https://tyctw.github.io/" target="_blank" class="nav-link">會考落點分析</a>
+            <a href="https://tyctw.github.io/Navigation/" target="_blank" class="nav-link">更多資訊</a>
+            <a href="#" class="nav-link" id="toggleDarkMode">切換暗色模式</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+        
+        <div class="sidebar">
+            <div class="card filter-section">
+                <h2 class="card-title">學校篩選</h2>
+                <select id="district-select" aria-label="選擇區域">
+                    <option value="all">全部區域</option>
+                    <!-- 區域選項將在JavaScript中動態添加 -->
+                </select>
+                
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="ownership" data-value="all">全部</button>
+                    <button class="filter-btn" data-filter="ownership" data-value="public">公立</button>
+                    <button class="filter-btn" data-filter="ownership" data-value="private">私立</button>
+                </div>
+                
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="type" data-value="all">全部</button>
+                    <button class="filter-btn" data-filter="type" data-value="高中">高中</button>
+                    <button class="filter-btn" data-filter="type" data-value="高職">高職</button>
+                    <button class="filter-btn" data-filter="type" data-value="五專">五專</button>
+                </div>
             </div>
-            <div class="filter-group">
-                <button class="filter-btn active" data-filter="type" data-value="all">全部</button>
-                <button class="filter-btn" data-filter="type" data-value="高中">高中</button>
-                <button class="filter-btn" data-filter="type" data-value="高職">高職</button>
-                <button class="filter-btn" data-filter="type" data-value="五專">五專</button>
+            
+            <div class="card location-card">
+                <h2 class="card-title">我的位置</h2>
+                <p>輸入您的地址或點擊地圖以設置位置</p>
+                <input type="text" id="address-input" placeholder="輸入您的地址" aria-label="地址輸入">
+                <button id="submit-address" class="submit-btn">提交</button>
+                <div class="loading" aria-hidden="true"></div>
+            </div>
+            
+            <div class="school-list" id="schoolList">
+                <!-- 學校列表將在JavaScript中動態添加 -->
             </div>
         </div>
-        <div id="location-info">
-            <p>輸入您的地址或點擊地圖以設置位置</p>
-            <input type="text" id="address-input" placeholder="輸入您的地址">
-            <button id="submit-address">提交</button>
-            <div class="loading"></div>
-        </div>
-        <div id="schoolList"></div>
     </div>
-</div>
-<div id="footer">
-    © 2025 TYCTW桃園市高中職地圖 | 資料來源：桃園市教育局 | 地圖資料：OpenStreetMap contributors
-</div>
+    
+    <footer class="footer">
+        © 2025 TYCTW桃園市高中職地圖 | 資料來源：桃園市教育局 | 地圖資料：OpenStreetMap contributors
+    </footer>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // 初始化地圖
     const taoyuanCenter = [24.9936, 121.3010];
     const map = L.map('map').setView(taoyuanCenter, 11);
 
@@ -343,6 +547,7 @@ document.addEventListener('DOMContentLoaded', function() {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
+    // 學校數據
     const schools = [
         {name: "方曙商工", address: "桃園市龍潭區上林村中原路一段50號", type: "高職", website: "http://www.fsvs.tyc.edu.tw", isPublic: false},
         {name: "永平工商", address: "桃園市楊梅區(埔心)永平路480號", type: "高職", website: "http://www.ypvs.tyc.edu.tw", isPublic: false},
@@ -380,143 +585,220 @@ document.addEventListener('DOMContentLoaded', function() {
         {name: "新生醫護管理專科學校", address: "桃園市龍潭區中豐路高平段418號", type: "五專", website: "http://www.web.hsc.edu.tw/bin/home.php", isPublic: false}
     ];
 
+    // 學校類型顏色
     const typeColors = {
         "高職": "#FF6B6B",
         "高中": "#4ECDC4",
         "五專": "#45B7D1"
     };
 
+    // 初始化變數
     const markers = {};
     let userMarker = null;
     let currentOwnershipFilter = 'all';
     let currentTypeFilter = 'all';
     let currentDistrictFilter = 'all';
 
-    // 提取所有區域並添加到選擇框中
-    const districts = [...new Set(schools.map(school => school.address.split('市')[1].split('區')[0] + '區'))];
-    const districtSelect = document.getElementById('district-select');
-    districts.forEach(district => {
-        const option = document.createElement('option');
-        option.value = district;
-        option.textContent = district;
-        districtSelect.appendChild(option);
-    });
-
-    function createSchoolMarkers() {
+    // 初始化學校座標（使用隨機座標進行示範）
+    function initializeSchoolCoordinates() {
         schools.forEach(school => {
-            const icon = L.divIcon({
-                className: 'custom-div-icon',
-                html: `<div style='background-color:${typeColors[school.type]};width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:18px;box-shadow:0 2px 5px rgba(0,0,0,0.3);'>${school.name[0]}</div>`,
-                iconSize: [40, 40],
-                iconAnchor: [20, 20]
-            });
-
-            const marker = L.marker(getRandomCoordinate(taoyuanCenter), {icon: icon})
-                .bindPopup(`
-                    <div style="font-family:'Roboto',sans-serif;text-align:center;">
-                        <h3 style="margin:0 0 10px;color:#333;">${school.name}</h3>
-                        <p style="margin:0 0 5px;color:#666;">${school.address}</p>
-                        <p style="margin:0 0 5px;color:#666;">${school.type} (${school.isPublic ? '公立' : '私立'})</p>
-                        <a href="${school.website}" target="_blank" style="display:inline-block;margin-top:10px;padding:5px 10px;background-color:#3498db;color:white;text-decoration:none;border-radius:3px;">學校網站</a>
-                    </div>
-                `, {
-                    maxWidth: 300
-                });
-
-            markers[school.name] = marker;
+            school.coordinate = getRandomCoordinate(taoyuanCenter);
+            createSchoolMarker(school);
         });
     }
 
-    createSchoolMarkers();
+    // 創建學校標記
+    function createSchoolMarker(school) {
+        const icon = L.divIcon({
+            className: 'custom-div-icon',
+            html: `<div style='background-color:${typeColors[school.type]};width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:18px;box-shadow:0 2px 5px rgba(0,0,0,0.3);'>${school.name[0]}</div>`,
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+        });
 
-    const schoolListElement = document.getElementById('schoolList');
-    
+        const marker = L.marker(school.coordinate, {icon: icon})
+            .bindPopup(createPopupContent(school), {
+                maxWidth: 300,
+                className: 'custom-popup'
+            });
+
+        marker.on('click', function() {
+            updateSchoolHighlight(school.name);
+        });
+
+        markers[school.name] = marker;
+    }
+
+    // 創建彈出窗口內容
+    function createPopupContent(school) {
+        return `
+            <div class="popup-content">
+                <div class="popup-header">
+                    <h3 class="popup-title">${school.name}</h3>
+                </div>
+                <div class="popup-body">
+                    <p class="popup-info">${school.address}</p>
+                    <p class="popup-info">${school.type} (${school.isPublic ? '公立' : '私立'})</p>
+                    <a href="${school.website}" target="_blank" class="popup-link">查看學校網站</a>
+                </div>
+            </div>
+        `;
+    }
+
+    // 提取所有區域並添加到選擇框
+    function populateDistrictSelect() {
+        const districts = [...new Set(schools.map(school => {
+            const addressParts = school.address.split('市');
+            if (addressParts.length > 1) {
+                const districtPart = addressParts[1].split('區');
+                if (districtPart.length > 0) {
+                    return districtPart[0] + '區';
+                }
+            }
+            return '未知區';
+        }))];
+        
+        const districtSelect = document.getElementById('district-select');
+        districts.forEach(district => {
+            const option = document.createElement('option');
+            option.value = district;
+            option.textContent = district;
+            districtSelect.appendChild(option);
+        });
+    }
+
+    // 更新學校列表
     function updateSchoolList() {
+        const schoolListElement = document.getElementById('schoolList');
         schoolListElement.innerHTML = '';
+        
+        // 清除所有標記
         map.eachLayer((layer) => {
             if (layer instanceof L.Marker && layer !== userMarker) {
                 map.removeLayer(layer);
             }
         });
 
-        schools.forEach(school => {
+        // 篩選學校
+        const filteredSchools = schools.filter(school => {
             const schoolDistrict = school.address.split('市')[1].split('區')[0] + '區';
-            if ((currentOwnershipFilter === 'all' || 
+            
+            return (currentOwnershipFilter === 'all' || 
                 (currentOwnershipFilter === 'public' && school.isPublic) || 
                 (currentOwnershipFilter === 'private' && !school.isPublic)) &&
                 (currentTypeFilter === 'all' || currentTypeFilter === school.type) &&
-                (currentDistrictFilter === 'all' || currentDistrictFilter === schoolDistrict)) {
-                const schoolItem = document.createElement('div');
-                schoolItem.className = 'school-item';
-                let distanceText = '';
-                if (userMarker) {
-                    const distance = userMarker.getLatLng().distanceTo(markers[school.name].getLatLng()) / 1000;
-                }
-                schoolItem.innerHTML = `
-                    <div class="school-icon" style="background-color:${typeColors[school.type]}">${school.name[0]}</div>
-                    <div class="school-info">
-                        <span class="school-name">${school.name}</span>
-                        <span class="school-type">${school.type} (${school.isPublic ? '公立' : '私立'})</span>
-                        <span class="school-address">${school.address}</span>
-                        ${distanceText}
-                    </div>
-                `;
-                schoolItem.addEventListener('click', () => {
-                    map.setView(markers[school.name].getLatLng(), 14);
-                    markers[school.name].openPopup();
-                });
-                schoolListElement.appendChild(schoolItem);
-                markers[school.name].addTo(map);
+                (currentDistrictFilter === 'all' || currentDistrictFilter === schoolDistrict);
+        });
+
+        // 排序學校 - 如果有用戶位置，則按距離排序
+        if (userMarker) {
+            filteredSchools.forEach(school => {
+                school.distance = L.latLng(school.coordinate).distanceTo(userMarker.getLatLng()) / 1000;
+            });
+            
+            filteredSchools.sort((a, b) => a.distance - b.distance);
+        }
+
+        // 添加學校到列表和地圖
+        filteredSchools.forEach(school => {
+            // 建立學校項目元素
+            const schoolItem = document.createElement('div');
+            schoolItem.className = 'school-item';
+            schoolItem.dataset.name = school.name;
+            
+            // 添加距離資訊（如果有）
+            let distanceText = '';
+            if (userMarker && school.distance !== undefined) {
+                distanceText = `<span class="school-distance">距離您 ${school.distance.toFixed(1)} 公里</span>`;
             }
+            
+            // 設置HTML內容
+            schoolItem.innerHTML = `
+                <div class="school-icon" style="background-color:${typeColors[school.type]}">${school.name[0]}</div>
+                <div class="school-info">
+                    <span class="school-name">${school.name}</span>
+                    <span class="school-type">${school.type} (${school.isPublic ? '公立' : '私立'})</span>
+                    <span class="school-address">${school.address}</span>
+                    ${distanceText}
+                </div>
+            `;
+            
+            // 添加點擊事件
+            schoolItem.addEventListener('click', () => {
+                map.setView(markers[school.name].getLatLng(), 14);
+                markers[school.name].openPopup();
+                updateSchoolHighlight(school.name);
+            });
+            
+            // 添加到列表和地圖
+            schoolListElement.appendChild(schoolItem);
+            markers[school.name].addTo(map);
         });
     }
 
-    updateSchoolList();
-
-    map.on('click', function(e) {
-        setUserLocation(e.latlng);
-    });
-
-    document.getElementById('submit-address').addEventListener('click', function() {
-        const address = document.getElementById('address-input').value;
-        if (address) {
-            document.querySelector('.loading').style.display = 'block';
-            geocodeAddress(address);
+    // 高亮顯示選中的學校
+    function updateSchoolHighlight(schoolName) {
+        // 移除所有高亮
+        document.querySelectorAll('.school-item').forEach(item => {
+            item.style.backgroundColor = '';
+            item.style.borderLeft = '';
+        });
+        
+        // 添加高亮到選中的學校
+        const selectedItem = document.querySelector(`.school-item[data-name="${schoolName}"]`);
+        if (selectedItem) {
+            selectedItem.style.backgroundColor = '#f0f7ff';
+            selectedItem.style.borderLeft = '4px solid var(--primary-color)';
+            selectedItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-    });
+    }
 
+    // 設置用戶位置
     function setUserLocation(latlng) {
         if (userMarker) {
             map.removeLayer(userMarker);
         }
+        
+        // 創建用戶位置標記
         userMarker = L.marker(latlng, {
             icon: L.divIcon({
                 className: 'custom-div-icon',
-                html: '<div style="background-color:#3498db;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:16px;box-shadow:0 2px 5px rgba(0,0,0,0.3);">您</div>',
+                html: '<div style="background-color:var(--primary-color);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:16px;box-shadow:0 2px 5px rgba(0,0,0,0.3);">您</div>',
                 iconSize: [40, 40],
                 iconAnchor: [20, 20]
             })
         }).addTo(map);
+        
         userMarker.bindPopup('您的位置').openPopup();
-
-        const locationInfo = document.getElementById('location-info');
-        locationInfo.innerHTML = `
-            <p>您的位置: ${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}</p>
-            <input type="text" id="address-input" placeholder="輸入您的地址">
-            <button id="submit-address">提交</button>
-            <div class="loading"></div>
+        
+        // 更新位置卡片
+        const locationCard = document.querySelector('.location-card');
+        locationCard.innerHTML = `
+            <h2 class="card-title">我的位置</h2>
+            <p>您的位置已設定於 ${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}</p>
+            <input type="text" id="address-input" placeholder="輸入您的地址" aria-label="地址輸入">
+            <button id="submit-address" class="submit-btn">更新位置</button>
+            <div class="loading" aria-hidden="true"></div>
         `;
-
+        
+        // 重新添加事件監聽器
+        document.getElementById('submit-address').addEventListener('click', submitAddressHandler);
+        
+        // 更新視圖和學校列表
         map.setView(latlng, 12);
         updateSchoolList();
     }
 
+    // 地理編碼地址
     function geocodeAddress(address) {
-        const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+        const loading = document.querySelector('.loading');
+        loading.style.display = 'block';
+        
+        const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address + ', 桃園市, 臺灣')}`;
         
         axios.get(nominatimUrl)
             .then(response => {
-                document.querySelector('.loading').style.display = 'none';
+                loading.style.display = 'none';
                 if (response.data && response.data.length > 0) {
                     const result = response.data[0];
                     setUserLocation(L.latLng(result.lat, result.lon));
@@ -525,68 +807,150 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                document.querySelector('.loading').style.display = 'none';
-                console.error('Geocoding error:', error);
+                loading.style.display = 'none';
+                console.error('地理編碼錯誤:', error);
                 alert('地址搜尋出錯，請稍後再試。');
             });
     }
 
+    // 地址提交處理
+    function submitAddressHandler() {
+        const address = document.getElementById('address-input').value;
+        if (address) {
+            geocodeAddress(address);
+        } else {
+            alert('請輸入地址');
+        }
+    }
+
+    // 生成隨機座標（僅用於示範）
     function getRandomCoordinate(center) {
         const lat = center[0] + (Math.random() - 0.5) * 0.2;
         const lng = center[1] + (Math.random() - 0.5) * 0.2;
         return [lat, lng];
     }
 
-    // Add event listeners for filter buttons
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const filterType = this.dataset.filter;
-            const filterValue = this.dataset.value;
-            
-            // Remove active class from all buttons in the same group
-            document.querySelectorAll(`.filter-btn[data-filter="${filterType}"]`).forEach(b => b.classList.remove('active'));
-            
-            // Add active class to clicked button
-            this.classList.add('active');
-            
-            if (filterType === 'ownership') {
-                currentOwnershipFilter = filterValue;
-            } else if (filterType === 'type') {
-                currentTypeFilter = filterValue;
-            }
-            
-            updateSchoolList();
-        });
-    });
-
-    // Add event listener for district select
-    districtSelect.addEventListener('change', function() {
-        currentDistrictFilter = this.value;
-        updateSchoolList();
-    });
-
-    // 添加響應式設計
-    function handleResize() {
-        const isMobile = window.innerWidth < 768;
-        const content = document.getElementById('content');
-        const map = document.getElementById('map');
-        const sidebar = document.getElementById('sidebar');
-
-        if (isMobile) {
-            content.style.flexDirection = 'column';
-            map.style.height = '50vh';
-            sidebar.style.height = 'auto';
+    // 漢堡菜單處理
+    function toggleMobileMenu() {
+        const navLinks = document.getElementById('navLinks');
+        const hamburger = document.getElementById('hamburger');
+        navLinks.classList.toggle('active');
+        hamburger.classList.toggle('active');
+        
+        // 防止滾動
+        if (navLinks.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
         } else {
-            content.style.flexDirection = 'row';
-            map.style.height = 'calc(100vh - 140px)';
-            sidebar.style.height = 'calc(100vh - 140px)';
+            document.body.style.overflow = 'auto';
         }
     }
 
-    window.addEventListener('resize', handleResize);
-    handleResize(); // 初始化時調用一次
+    // 暗色模式切換
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        
+        // 保存用戶偏好
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDarkMode);
+        
+        // 關閉菜單（如果在手機模式下）
+        if (window.innerWidth <= 768) {
+            toggleMobileMenu();
+        }
+    }
+
+    // 初始化事件監聽器
+    function initEventListeners() {
+        // 地圖點擊事件
+        map.on('click', function(e) {
+            setUserLocation(e.latlng);
+        });
+        
+        // 地址提交按鈕
+        document.getElementById('submit-address').addEventListener('click', submitAddressHandler);
+        
+        // 篩選按鈕
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const filterType = this.dataset.filter;
+                const filterValue = this.dataset.value;
+                
+                // 移除相同組別中所有按鈕的active類
+                document.querySelectorAll(`.filter-btn[data-filter="${filterType}"]`).forEach(b => b.classList.remove('active'));
+                
+                // 添加active類到被點擊的按鈕
+                this.classList.add('active');
+                
+                // 更新當前篩選
+                if (filterType === 'ownership') {
+                    currentOwnershipFilter = filterValue;
+                } else if (filterType === 'type') {
+                    currentTypeFilter = filterValue;
+                }
+                
+                // 更新學校列表
+                updateSchoolList();
+            });
+        });
+        
+        // 區域選擇變更
+        document.getElementById('district-select').addEventListener('change', function() {
+            currentDistrictFilter = this.value;
+            updateSchoolList();
+        });
+        
+        // 漢堡菜單點擊
+        document.getElementById('hamburger').addEventListener('click', toggleMobileMenu);
+        
+        // 暗色模式切換
+        document.getElementById('toggleDarkMode').addEventListener('click', toggleDarkMode);
+        
+        // 檢查用戶之前是否啟用了暗色模式
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+        
+        // 響應視窗大小變化
+        window.addEventListener('resize', handleResize);
+        
+        // 點擊導航外部區域關閉菜單
+        document.addEventListener('click', function(e) {
+            const navLinks = document.getElementById('navLinks');
+            const hamburger = document.getElementById('hamburger');
+            if (navLinks.classList.contains('active') && 
+                !navLinks.contains(e.target) && 
+                !hamburger.contains(e.target)) {
+                toggleMobileMenu();
+            }
+        });
+    }
+
+    // 響應式設計處理
+    function handleResize() {
+        const isMobile = window.innerWidth < 768;
+        const navLinks = document.getElementById('navLinks');
+        
+        if (!isMobile && navLinks.classList.contains('active')) {
+            navLinks.classList.remove('active');
+        }
+    }
+
+    // 初始化應用
+    function initApp() {
+        initializeSchoolCoordinates();
+        populateDistrictSelect();
+        updateSchoolList();
+        initEventListeners();
+        handleResize();
+    }
+
+    // 啟動應用
+    initApp();
 });
-            // 防止複製
+
+// 加強版安全措施
+(function() {
+    // 防止複製
     document.addEventListener('copy', function(e) {
       e.preventDefault();
       return false;
@@ -609,5 +973,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.onselectstart = function() {
       return false;
     };
+})();
 </script>
 </body></html>
+
