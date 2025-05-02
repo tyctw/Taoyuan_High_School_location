@@ -13,6 +13,7 @@
             --primary-color: #4285F4;
             --secondary-color: #34A853;
             --accent-color: #EA4335;
+            --yellow-color: #FBBC05;
             --light-color: #F8F9FA;
             --dark-color: #202124;
             --gray-color: #5F6368;
@@ -46,6 +47,25 @@
             position: sticky;
             top: 0;
             z-index: 1000;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: shimmer 15s infinite linear;
+            z-index: 0;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         .logo {
@@ -53,17 +73,26 @@
             align-items: center;
             color: white;
             text-decoration: none;
+            position: relative;
+            z-index: 1;
         }
         
         .logo img {
             width: 40px;
             height: 40px;
             margin-right: 1rem;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+            transition: transform 0.3s ease;
+        }
+        
+        .logo:hover img {
+            transform: scale(1.1) rotate(5deg);
         }
         
         .logo h1 {
             font-size: 1.5rem;
             font-weight: 700;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
         .nav-links {
@@ -145,9 +174,22 @@
         
         .card {
             background-color: white;
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 1.5rem;
             box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color), var(--yellow-color));
         }
         
         .card-title {
@@ -182,49 +224,110 @@
             transition: var(--transition);
             font-size: 0.9rem;
             font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .filter-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .filter-btn:hover::after {
+            transform: translateX(100%);
         }
         
         .filter-btn.active {
             background-color: var(--primary-color);
             color: white;
+            box-shadow: 0 3px 8px rgba(66, 133, 244, 0.3);
+            transform: translateY(-2px);
         }
         
-        .filter-btn:hover {
+        .filter-btn:hover:not(.active) {
+            background-color: #e9ecef;
             transform: translateY(-2px);
         }
         
         select {
             width: 100%;
             padding: 0.8rem;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid #ddd;
             font-family: inherit;
             font-size: 0.9rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%235F6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
         }
         
         .location-card input {
             width: 100%;
             padding: 0.8rem;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid #ddd;
             margin: 0.5rem 0 1rem;
             font-family: inherit;
+            transition: var(--transition);
+        }
+        
+        .location-card input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
         }
         
         .submit-btn {
             width: 100%;
             padding: 0.8rem;
             border: none;
-            border-radius: 8px;
-            background-color: var(--primary-color);
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-color), #5B9BFF);
             color: white;
             cursor: pointer;
             font-weight: 500;
             transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .submit-btn:hover::after {
+            transform: translateX(100%);
         }
         
         .submit-btn:hover {
-            background-color: #3B78E7;
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.4);
             transform: translateY(-2px);
         }
         
@@ -268,6 +371,25 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             transition: var(--transition);
             cursor: pointer;
+            border-left: 4px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .school-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .school-item:hover::after {
+            transform: translateX(100%);
         }
         
         .school-item:hover {
@@ -285,6 +407,21 @@
             color: white;
             font-weight: bold;
             font-size: 1.2rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .school-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1;
         }
         
         .school-info {
@@ -303,17 +440,46 @@
         .school-type {
             font-size: 0.9rem;
             color: var(--gray-color);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .school-type::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
         }
         
         .school-address {
             font-size: 0.9rem;
             color: var(--gray-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .school-address::before {
+            content: '📍';
+            font-size: 0.8rem;
         }
         
         .school-distance {
             font-size: 0.9rem;
             color: var(--primary-color);
             font-weight: 500;
+            margin-top: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .school-distance::before {
+            content: '��';
+            font-size: 0.9rem;
         }
         
         /* 頁腳 */
@@ -323,6 +489,20 @@
             text-align: center;
             padding: 1.5rem;
             font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.5;
+            z-index: 0;
         }
         
         /* 彈出視窗樣式 */
@@ -484,10 +664,11 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
             z-index: 900;
             transform: translateY(100%);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-top: 4px solid var(--primary-color);
         }
         
         .compare-panel.active {
@@ -500,32 +681,63 @@
             gap: 1rem;
             overflow-x: auto;
             padding: 0.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) #f0f0f0;
+        }
+        
+        .compare-schools::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .compare-schools::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+        
+        .compare-schools::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
         }
         
         .compare-school {
             background-color: var(--light-color);
             padding: 0.5rem 1rem;
-            border-radius: 5px;
+            border-radius: 10px;
             font-size: 0.9rem;
             white-space: nowrap;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            animation: scaleIn 0.3s ease;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
         
         .compare-buttons {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.8rem;
         }
         
         .compare-btn {
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1.2rem;
             border: none;
-            border-radius: 5px;
-            background-color: var(--primary-color);
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-color), #5B9BFF);
             color: white;
             cursor: pointer;
             font-weight: 500;
+            transition: var(--transition);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .compare-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
         }
         
         .compare-close {
@@ -534,7 +746,13 @@
             border: none;
             cursor: pointer;
             color: var(--gray-color);
-            font-size: 1.2rem;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .compare-close:hover {
+            color: var(--accent-color);
+            transform: rotate(90deg);
         }
         
         /* 收藏列表 */
@@ -542,6 +760,8 @@
             text-align: center;
             padding: 2rem 1rem;
             color: var(--gray-color);
+            font-style: italic;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z' fill='%23f0f0f0' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E");
         }
         
         .favorite-icon {
@@ -551,13 +771,34 @@
             background: none;
             border: none;
             color: #ccc;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             cursor: pointer;
             z-index: 5;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .favorite-icon:hover {
+            transform: scale(1.2);
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
         
         .favorite-icon.active {
             color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            animation: pulse 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
         }
         
         .school-item {
@@ -574,10 +815,11 @@
             background-color: white;
             z-index: 1200;
             transform: translateX(100%);
-            transition: transform 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.15);
         }
         
         .school-details.active {
@@ -585,18 +827,34 @@
         }
         
         .school-details-header {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), #5B9BFF);
             color: white;
             padding: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .school-details-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.5;
         }
         
         .school-details-name {
             font-size: 1.5rem;
             font-weight: 700;
             margin: 0;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
         }
         
         .school-close {
@@ -605,15 +863,45 @@
             color: white;
             font-size: 1.5rem;
             cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            z-index: 1;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .school-close:hover {
+            background-color: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
         }
         
         .school-details-content {
             padding: 1.5rem;
             flex: 1;
+            animation: fadeIn 0.5s ease;
         }
         
         .details-section {
             margin-bottom: 2rem;
+            animation: slideUp 0.5s ease;
+            animation-fill-mode: both;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .details-section:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        
+        .details-section:nth-child(3) {
+            animation-delay: 0.2s;
         }
         
         .details-section h3 {
@@ -621,7 +909,18 @@
             color: var(--primary-color);
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 1px solid #eee;
+            border-bottom: 2px solid #eee;
+            position: relative;
+        }
+        
+        .details-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary-color);
         }
         
         .details-info {
@@ -682,11 +981,31 @@
             padding: 1rem 1.5rem;
             background-color: var(--dark-color);
             color: white;
-            border-radius: 5px;
+            border-radius: 10px;
             opacity: 0;
             transform: translateY(-20px);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 2000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            max-width: 300px;
+            text-align: center;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .toast::before {
+            content: '✓';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            font-size: 12px;
         }
         
         .toast.active {
@@ -698,7 +1017,8 @@
         .tabs {
             display: flex;
             border-bottom: 1px solid #eee;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
+            position: relative;
         }
         
         .tab {
@@ -706,15 +1026,44 @@
             cursor: pointer;
             border-bottom: 3px solid transparent;
             font-weight: 500;
+            transition: var(--transition);
+            text-align: center;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .tab::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+        
+        .tab:hover::after {
+            width: 100%;
         }
         
         .tab.active {
-            border-color: var(--primary-color);
             color: var(--primary-color);
+        }
+        
+        .tab.active::after {
+            width: 100%;
         }
         
         .tab-content {
             display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .tab-content.active {
@@ -922,7 +1271,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function createSchoolMarker(school) {
         const icon = L.divIcon({
             className: 'custom-div-icon',
-            html: `<div style='background-color:${typeColors[school.type]};width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:18px;box-shadow:0 2px 5px rgba(0,0,0,0.3);'>${school.name[0]}</div>`,
+            html: `<div style='background-color:${typeColors[school.type]};width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:18px;box-shadow:0 3px 10px rgba(0,0,0,0.2);position:relative;overflow:hidden;' class='marker-icon'>
+                <div style='position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);'></div>
+                ${school.name[0]}
+            </div>`,
             iconSize: [40, 40],
             iconAnchor: [20, 20]
         });
@@ -933,7 +1285,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 className: 'custom-popup'
             });
 
+        marker.on('mouseover', function() {
+            this.openPopup();
+            this.getElement().querySelector('.marker-icon').style.transform = 'scale(1.1)';
+        });
+        
+        marker.on('mouseout', function() {
+            this.getElement().querySelector('.marker-icon').style.transform = 'scale(1)';
+        });
+
         marker.on('click', function() {
+            showSchoolDetails(school);
             updateSchoolHighlight(school.name);
         });
 
@@ -948,9 +1310,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     <h3 class="popup-title">${school.name}</h3>
                 </div>
                 <div class="popup-body">
-                    <p class="popup-info">${school.address}</p>
                     <p class="popup-info">${school.type} (${school.isPublic ? '公立' : '私立'})</p>
-                    <a href="${school.website}" target="_blank" class="popup-link">查看學校網站</a>
+                    <p class="popup-info">${school.address}</p>
+                    <div style="display:flex;justify-content:space-between;margin-top:10px;">
+                        <a href="${school.website}" target="_blank" class="popup-link">學校網站</a>
+                        <a href="#" class="popup-link" onclick="showSchoolDetails(${JSON.stringify(school).replace(/"/g, '&quot;')});return false;">詳細資訊</a>
+                    </div>
                 </div>
             </div>
         `;
@@ -1033,8 +1398,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="school-icon" style="background-color:${typeColors[school.type]}">${school.name[0]}</div>
                 <div class="school-info">
                     <span class="school-name">${school.name}</span>
-                    <span class="school-type">${school.type} (${school.isPublic ? '公立' : '私立'})</span>
-                    <span class="school-address">${school.address}</span>
+                    <div class="school-type">${school.type} (${school.isPublic ? '公立' : '私立'})</div>
+                    <div class="school-address">${school.address}</div>
                     ${distanceText}
                 </div>
             `;
@@ -1093,8 +1458,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="school-icon" style="background-color:${typeColors[school.type]}">${school.name[0]}</div>
                     <div class="school-info">
                         <span class="school-name">${school.name}</span>
-                        <span class="school-type">${school.type} (${school.isPublic ? '公立' : '私立'})</span>
-                        <span class="school-address">${school.address}</span>
+                        <div class="school-type">${school.type} (${school.isPublic ? '公立' : '私立'})</div>
+                        <div class="school-address">${school.address}</div>
                     </div>
                 `;
                 
